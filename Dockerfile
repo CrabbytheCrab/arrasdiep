@@ -1,7 +1,8 @@
 FROM node:16
+RUN npm install --global yarn
 WORKDIR /usr/src/app
 COPY . .
-RUN npm ci --include=dev
-RUN npm run build
+RUN yarn install
+RUN yarn run build
 USER node
-CMD npm run start
+CMD yarn run start
