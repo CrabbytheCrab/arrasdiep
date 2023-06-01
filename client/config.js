@@ -21,10 +21,7 @@ const CDN = "https://static.diep.io/";
 const API_URL = `${window.location.href}api/`;
 
 const CHANGELOG = [
-    "Updated recently",
-    "",
-    "Check out the GitHub repository!: github.com/ABCxFF/diepcustom",
-    "Join our Discord server: discord.gg/SyxWdxgHnT :)"
+"Weclome to arras but remade in diep"
 ];
 
 const ASM_CONSTS = {
