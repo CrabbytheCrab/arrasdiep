@@ -50,7 +50,7 @@ export const AutoTurretDefinition: BarrelDefinition = {
 /**
  * Auto Turret Barrel + Barrel Base
  */
-export default class AutoTurret extends ObjectEntity {
+export default class AutoTurretAlt extends ObjectEntity {
     // TODO(ABC):
     // Maybe just remove this
     /** For mounted turret name to show up on Auto Turrets. */
@@ -143,13 +143,12 @@ export default class AutoTurret extends ObjectEntity {
         let useAI = !(this.influencedByOwnerInputs && (this.owner.inputs.attemptingRepel() || this.owner.inputs.attemptingShot()));
         if (!useAI) {
             const {x, y} = this.getWorldPosition();
-            let flip = this.owner.inputs.attemptingRepel() ? -1 : 1;
+            let flip = 1;
             const deltaPos = {x: (this.owner.inputs.mouse.x - x) * flip, y: (this.owner.inputs.mouse.y - y) * flip}
-
+            this.inputs.flags |= InputFlags.leftclick;
             if (this.ai.targetFilter({x: x + deltaPos.x, y: y + deltaPos.y}) === false) useAI = true;
             else {
                 // if (this.owner.inputs.attemptingRepel()) this.inputs.flags |= InputFlags.rightclick;
-                this.inputs.flags |= InputFlags.leftclick;
                 this.positionData.angle = Math.atan2(deltaPos.y, deltaPos.x);
                 this.ai.state = AIState.hasTarget;
             }

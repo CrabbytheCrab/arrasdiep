@@ -102,7 +102,8 @@ export default class ObjectEntity extends Entity {
 
     /** For internal spatial hash grid */
     private _queryId: number = -1;
-
+    public MAXDRONES: number
+    public DroneCount: number
     /** Cache of all ObjectEntitys who are colliding with `this` one at the current tick */
     private cachedCollisions: ObjectEntity[] = [];
     /** Tick that the cache was taken. */
@@ -110,7 +111,8 @@ export default class ObjectEntity extends Entity {
 
     public constructor(game: GameServer) {
         super(game);
-
+        this.MAXDRONES = 0
+        this.DroneCount = 0
         this.styleData.zIndex = game.entities.zIndex++;
     }
 

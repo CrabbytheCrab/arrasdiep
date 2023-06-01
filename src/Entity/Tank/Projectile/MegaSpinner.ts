@@ -20,120 +20,103 @@ import Barrel from "../Barrel";
 import Bullet from "./Bullet";
 
 import { InputFlags } from "../../../Const/Enums";
+import { BarrelDefinition, TankDefinition } from "../../../Const/TankDefinitions";
 import { Entity } from "../../../Native/Entity";
 import { Inputs } from "../../AI";
-import { BarrelDefinition, TankDefinition } from "../../../Const/TankDefinitions";
 import { BarrelBase } from "../TankBody";
-import AutoTurret from "../AutoTurret";
-import ObjectEntity from "../../Object";
-import Vector from "../../../Physics/Vector";
 
 /**
- * Barrel definition for the rocketeer rocket's barrel.
+ * Barrel definition for the skimmer skimmer's barrel.
  */
-
-const RocketBarrelDefinition: BarrelDefinition = {
-    angle: 3.752457891787808,
+const SkimmerBarrelDefinition: BarrelDefinition = {
+    angle: Math.PI / 2,
     offset: 0,
-    size: 70,
-    width: 37.8 ,
+    size:  66.526,
+    width:  37.967,
     delay: 0,
-    reload: 0.8,
-    recoil: 4.5,
+    reload: 0.35,
+    recoil: 0,
     isTrapezoid: false,
     trapezoidDirection: 0,
     addon: null,
     bullet: {
         type: "bullet",
         health: 0.5,
-        damage: 0.6,
+        damage: 0.5,
         speed: 1,
         scatterRate: 1,
-        lifeLength: 0.5,
+        lifeLength: 0.25,
         sizeRatio: 1,
-        absorbtionFactor: 1
+        absorbtionFactor: 0.75
     }
 };
 
-
-const RocketBarrelDefinition2: BarrelDefinition = {
-    angle:  2.530727415391778,
-    offset: 0,
-    size: 70,
-    width: 37.8 ,
-    delay: 0,
-    reload: 0.8,
-    recoil: 4.5,
-    isTrapezoid: false,
-    trapezoidDirection: 0,
-    addon: null,
-    bullet: {
-        type: "bullet",
-        health: 0.5,
-        damage: 0.6,
-        speed: 1,
-        scatterRate: 1,
-        lifeLength: 0.5,
-        sizeRatio: 1,
-        absorbtionFactor: 1
-    }
-};
 /**
- * Represents all rocketeer rockets in game.
+ * Represents all skimmereer skimmers in game.
  */
-export default class Skimmer extends Bullet implements BarrelBase {
-    /** The rocket's barrel */
-    private launrocketBarrel: Barrel[];
+export default class MegaSpinner extends Bullet implements BarrelBase {
+    /** Default speed the skimmer spins */
+    public static BASE_ROTATION = 0.1;
 
-    /** The size ratio of the rocket. */
+    /** The skimmer's barrels */
+    private skimmerBarrels: Barrel[];
+
+    /** The size ratio of the skimmer. */
     public sizeFactor: number;
-    /** The camera entity (used as team) of the rocket. */
+    /** The camera entity (used as team) of the skimmer. */
     public cameraEntity: Entity;
-    /** The reload time of the rocket's barrel. */
-    public reloadTime = 1;
-    /** The inputs for when to shoot or not. (Rocket) */
-    public inputs = new Inputs();
+    /** The reload time of the skimmer's barrel. */
+    public reloadTime = 15;
+    /** The inputs for when to shoot or not. (skimmer) */
+    public inputs: Inputs;
+
+    /** The direction the bullet will rotating in. */
+    private rotationPerTick = MegaSpinner.BASE_ROTATION;
 
 
-    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number) {
+    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number, direction: number) {
         super(barrel, tank, tankDefinition, shootAngle);
-        
+
+        this.rotationPerTick = direction;
+
         this.cameraEntity = tank.cameraEntity;
+
         this.sizeFactor = this.physicsData.values.size / 50;
-        const skimmerBarrels: Barrel[] = this.launrocketBarrel =[];
+
+        const skimmerBarrels: Barrel[] = this.skimmerBarrels =[];
+
         const s1 = new class extends Barrel {
             // Keep the width constant
             protected resize() {
                 super.resize();
-               // this.physicsData.values.width = this.definition.width
+                //this.physicsData.values.width = this.definition.width
                 // this.physicsData.state.width = 0;
             }
-        }(this, {...RocketBarrelDefinition});
+        }(this, {...SkimmerBarrelDefinition});
+        const s2Definition = {...SkimmerBarrelDefinition};
+        s2Definition.angle += Math.PI
         const s2 = new class extends Barrel {
             // Keep the width constant
             protected resize() {
                 super.resize();
-               // this.physicsData.width = this.definition.width
+                //this.physicsData.width = this.definition.width
             }
-        }(this, RocketBarrelDefinition2);
-
-        s1.styleData.values.color = this.styleData.values.color;
-        s2.styleData.values.color = this.styleData.values.color;
+        }(this, s2Definition);
 
         skimmerBarrels.push(s1, s2);
+
+        this.inputs = new Inputs();
+        this.inputs.flags |= InputFlags.leftclick;
     }
 
     public tick(tick: number) {
         this.sizeFactor = this.physicsData.values.size / 50;
         this.reloadTime = this.tank.reloadTime;
-
+        this.positionData.angle += this.rotationPerTick;
         super.tick(tick);
 
         if (this.deletionAnimation) return;
-        // not fully accurate
-        this.inputs.flags |= InputFlags.leftclick;
         // Only accurate on current version, but we dont want that
-        // if (!Entity.exists(this.barrelEntity.rootParent) && (this.inputs.flags & InputFlags.leftclick)) this.inputs.flags ^= InputFlags.leftclick; 
-
+        // if (!Entity.exists(this.barrelEntity.rootParent) && (this.inputs.flags & InputFlags.leftclick)) this.inputs.flags ^= InputFlags.leftclick;
     }
 }

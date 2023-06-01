@@ -36,6 +36,8 @@ import { Inputs } from "../AI";
 import AbstractBoss from "../Boss/AbstractBoss";
 import { ArenaState } from "../../Native/Arena";
 import { AccessLevel, maxPlayerLevel } from "../../config";
+import Egg from "../Shape/Egg";
+import NecromancerEgg from "./Projectile/NecromancerEgg";
 
 /**
  * Abstract type of entity which barrels can connect to.
@@ -64,7 +66,8 @@ export default class TankBody extends LivingEntity implements BarrelBase {
     public barrels: Barrel[] = [];
     /** The tank's addons, if any. */
     private addons: Addon[] = [];
-
+    public bool:boolean
+    public fov:number
     /** Size of the tank at level 1. Defined by tank loader.  */
     public baseSize = 50;
     /** The definition of the currentTank */
@@ -80,7 +83,8 @@ export default class TankBody extends LivingEntity implements BarrelBase {
         super(game);
         this.cameraEntity = camera;
         this.inputs = inputs;
-
+        this.fov = 0
+        this.bool = true
         this.physicsData.values.size = 50;
         this.physicsData.values.sides = 1;
         this.styleData.values.color = Color.Tank;
@@ -186,7 +190,7 @@ export default class TankBody extends LivingEntity implements BarrelBase {
         if (entity instanceof Square && this.definition.flags.canClaimSquares && this.barrels.length) {
             // If can claim, pick a random barrel that has drones it can still shoot, then shoot
             const MAX_DRONES_PER_BARREL = 11 + this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload];
-            const barrelsToShoot = this.barrels.filter((e) => e.definition.bullet.type === "necrodrone" && e.droneCount < MAX_DRONES_PER_BARREL);
+            const barrelsToShoot = this.barrels.filter((e) => e.definition.bullet.type === "necrodrone" && this.DroneCount < this.MAXDRONES);
 
             if (barrelsToShoot.length) {
                 const barrelToShoot = barrelsToShoot[~~(Math.random()*barrelsToShoot.length)];
@@ -199,6 +203,25 @@ export default class TankBody extends LivingEntity implements BarrelBase {
                 }
 
                 const sunchip = NecromancerSquare.fromShape(barrelToShoot, this, this.definition, entity);
+            }
+        }
+
+        if (entity instanceof Egg && this.definition.flags.canClaimEggs && this.barrels.length) {
+            // If can claim, pick a random barrel that has drones it can still shoot, then shoot
+            const MAX_DRONES_PER_BARREL = 11 + this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload];
+            const barrelsToShoot = this.barrels.filter((e) => e.definition.bullet.type === "eggdrone" && this.DroneCount < this.MAXDRONES);
+
+            if (barrelsToShoot.length) {
+                const barrelToShoot = barrelsToShoot[~~(Math.random()*barrelsToShoot.length)];
+
+                // No destroy it on the next tick to make it look more like the way diep does it.
+                entity.destroy(true);
+                if (entity.deletionAnimation) {
+                    entity.deletionAnimation.frame = 0;
+                    entity.styleData.opacity = 1;
+                }
+
+                const sunchip = NecromancerEgg.fromShape(barrelToShoot, this, this.definition, entity);
             }
         }
     }
@@ -251,7 +274,9 @@ export default class TankBody extends LivingEntity implements BarrelBase {
 
     public tick(tick: number) {
         this.positionData.angle = Math.atan2(this.inputs.mouse.y - this.positionData.values.y, this.inputs.mouse.x - this.positionData.values.x);
-
+        if(this._currentTank == Tank.Xhunter && this.bool){
+            this.bool = false
+            this.fov = this.cameraEntity.cameraData.FOV}
         if (this.isInvulnerable) {
             if (this.game.clients.size !== 1 || this.game.arena.state !== ArenaState.OPEN) {
                 // not for ACs
@@ -285,9 +310,15 @@ export default class TankBody extends LivingEntity implements BarrelBase {
                 const angle = Math.atan2(this.inputs.mouse.y - this.positionData.values.y, this.inputs.mouse.x - this.positionData.values.x)
                 this.cameraEntity.cameraData.cameraX = Math.cos(angle) * 1000 + this.positionData.values.x;
                 this.cameraEntity.cameraData.cameraY = Math.sin(angle) * 1000 + this.positionData.values.y;
+                if(this._currentTank == Tank.Xhunter){
+                this.cameraEntity.cameraData.FOV *= 0.8}
                 this.cameraEntity.cameraData.flags |= CameraFlags.usesCameraCoords;
             }
-        } else if (this.cameraEntity.cameraData.values.flags & CameraFlags.usesCameraCoords) this.cameraEntity.cameraData.flags ^= CameraFlags.usesCameraCoords;
+        } else if (this.cameraEntity.cameraData.values.flags & CameraFlags.usesCameraCoords){ 
+            if(this._currentTank == Tank.Xhunter){
+                this.cameraEntity.cameraData.FOV *= 1.25
+            }
+            this.cameraEntity.cameraData.flags ^= CameraFlags.usesCameraCoords};
 
         if (this.definition.flags.invisibility) {
 
@@ -305,11 +336,18 @@ export default class TankBody extends LivingEntity implements BarrelBase {
             // Damage
             this.damagePerTick = this.cameraEntity.cameraData.statLevels[Stat.BodyDamage] * 6 + 20;
             if (this._currentTank === Tank.Spike) this.damagePerTick *= 1.5;
+            if (this._currentTank === Tank.Infestor) (this.MAXDRONES = 44 + (this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload] *4));
 
+            if (this._currentTank === Tank.Maleficitor || this._currentTank === Tank.Underseer) this.MAXDRONES = 11 + this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload];
+            if (this._currentTank === Tank.Necromancer) this.MAXDRONES = 22 + (this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload] * 2);
             // Max Health
             const maxHealthCache = this.healthData.values.maxHealth;
 
-            this.healthData.maxHealth = this.definition.maxHealth + 2 * (this.cameraEntity.cameraData.values.level - 1) + this.cameraEntity.cameraData.values.statLevels.values[Stat.MaxHealth] * 20;
+            if (this._currentTank === Tank.MegaSmasher){
+                this.healthData.maxHealth = this.definition.maxHealth + 2 * (this.cameraEntity.cameraData.values.level - 1) + (this.cameraEntity.cameraData.values.statLevels.values[Stat.MaxHealth]) * 20 * 1.5}
+                    else if (this._currentTank === Tank.autoSmasher){
+                        this.healthData.maxHealth = this.definition.maxHealth + 2 * (this.cameraEntity.cameraData.values.level - 1) + (this.cameraEntity.cameraData.values.statLevels.values[Stat.MaxHealth]) * 20 * 1.1;}
+                    else{ this.healthData.maxHealth = this.definition.maxHealth + 2 * (this.cameraEntity.cameraData.values.level - 1) + this.cameraEntity.cameraData.values.statLevels.values[Stat.MaxHealth] * 20}
             if (this.healthData.values.health === maxHealthCache) this.healthData.health = this.healthData.maxHealth; // just in case
             else if (this.healthData.values.maxHealth !== maxHealthCache) {
                 this.healthData.health *= this.healthData.values.maxHealth / maxHealthCache
@@ -317,6 +355,7 @@ export default class TankBody extends LivingEntity implements BarrelBase {
 
             // Regen
             this.regenPerTick = (this.healthData.values.maxHealth * 4 * this.cameraEntity.cameraData.values.statLevels.values[Stat.HealthRegen] + this.healthData.values.maxHealth) / 25000;
+            if (this._currentTank === Tank.MegaSmasher) this.regenPerTick *= 1.25;
 
             // Reload
             this.reloadTime = 15 * Math.pow(0.914, this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload]);

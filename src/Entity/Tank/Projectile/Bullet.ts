@@ -23,6 +23,7 @@ import { HealthFlags, PositionFlags, PhysicsFlags, Stat, StyleFlags } from "../.
 import { TankDefinition } from "../../../Const/TankDefinitions";
 import { BarrelBase } from "../TankBody";
 import { EntityStateFlags } from "../../../Native/Entity";
+import ObjectEntity from "../../Object";
 
 /**
  * The bullet class represents the bullet entity in diep.
@@ -48,9 +49,11 @@ export default class Bullet extends LivingEntity {
     protected usePosAngle = false;
     /** The tank who shot the bullet. */
     protected tank: BarrelBase;
+    protected parent: ObjectEntity;
 
-    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number) {
+    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number, parent?: ObjectEntity) {
         super(barrel.game);
+        this.parent = parent ?? tank;
 
         this.tank = tank;
         
@@ -107,7 +110,7 @@ export default class Bullet extends LivingEntity {
         // TODO(ABC):
         // Make this, work differently
         /** @ts-ignore */
-        if (typeof this.tank.onKill === 'function') this.tank.onKill(killedEntity);
+        if (typeof this.parent.onKill === 'function') this.parent.onKill(killedEntity);
     }
 
     public tick(tick: number) {

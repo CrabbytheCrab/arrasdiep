@@ -22,14 +22,14 @@ import Bullet from "./Bullet";
 import { PhysicsFlags, StyleFlags } from "../../../Const/Enums";
 import { TankDefinition } from "../../../Const/TankDefinitions";
 import { Entity } from "../../../Native/Entity";
-import { AI, AIState } from "../../AI";
+import { AI, AIState, Inputs } from "../../AI";
 import { BarrelBase } from "../TankBody";
-import ObjectEntity from "../../Object";
+import AutoTurret from "../AutoTurret";
 
 /**
  * The drone class represents the drone (projectile) entity in diep.
  */
-export default class Drone extends Bullet {
+export default class AutoDrone extends Bullet  implements BarrelBase{
     /** The AI of the drone (for AI mode) */
     public ai: AI;
 
@@ -37,19 +37,49 @@ export default class Drone extends Bullet {
     public static MAX_RESTING_RADIUS = 400 ** 2;
 
     /** Used let the drone go back to the player in time. */
-    private restCycle = true;
-
+    public restCycle = true;
+    public sizeFactor: number;
+    public cameraEntity: Entity;
+    public inputs = new Inputs();
     /** Cached prop of the definition. */
     protected canControlDrones: boolean;
+    public reloadTime = 15;
 
-    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number, parent?: ObjectEntity) {
+    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number) {
         super(barrel, tank, tankDefinition, shootAngle);
-        this.parent = parent ?? tank;
 
         const bulletDefinition = barrel.definition.bullet;
 
         this.usePosAngle = true;
-        
+        this.cameraEntity = tank.cameraEntity;
+
+                    const atuo = new AutoTurret(this, {
+                        angle: 0,
+                        offset: 0,
+                        size: 65,
+                        width: 33.6,
+                        delay: 0.21,
+                        reload: 3,
+                        recoil: 0,
+                        isTrapezoid: false,
+                        trapezoidDirection: 0,
+                        addon: null,
+                        bullet: {
+                            type: "bullet",
+                            sizeRatio: 1,
+                            health: 1,
+                            damage: 0.45,
+                            speed: 1.2,
+                            scatterRate: 1,
+                            lifeLength: 0.75,
+                            absorbtionFactor: 0.1
+                        }
+                    });
+                        atuo.baseSize *= 1.25
+                      //  atuo.positionData.values.angle = shootAngle
+                atuo.positionData.values.angle = shootAngle
+                atuo.ai.viewRange = 1000
+        this.sizeFactor = this.physicsData.values.size / 50;
         this.ai = new AI(this);
         this.ai.viewRange = 850 * tank.sizeFactor;
         this.ai.targetFilter = (targetPos) => (targetPos.x - this.tank.positionData.values.x) ** 2 + (targetPos.y - this.tank.positionData.values.y) ** 2 <= this.ai.viewRange ** 2; // (1000 ** 2) 1000 radius
@@ -57,13 +87,13 @@ export default class Drone extends Bullet {
         this.physicsData.values.sides = bulletDefinition.sides ?? 3;
         if (this.physicsData.values.flags & PhysicsFlags.noOwnTeamCollision) this.physicsData.values.flags ^= PhysicsFlags.noOwnTeamCollision;
         this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
-        this.physicsData.values.flags ^= PhysicsFlags.canEscapeArena;
         this.styleData.values.flags &= ~StyleFlags.hasNoDmgIndicator;
 
         if (barrel.definition.bullet.lifeLength !== -1) {
             this.lifeLength = 88 * barrel.definition.bullet.lifeLength;
         } else {
             this.lifeLength = Infinity;
+            if (this.physicsData.values.flags & PhysicsFlags.canEscapeArena) this.physicsData.values.flags ^= PhysicsFlags.canEscapeArena;
         }
         this.deathAccelFactor = 1;
 
@@ -95,22 +125,23 @@ export default class Drone extends Bullet {
 
         if (usingAI && this.ai.state === AIState.idle) {
             const delta = {
-                x: this.positionData.values.x - this.parent.positionData.values.x,
-                y: this.positionData.values.y - this.parent.positionData.values.y
+                x: this.positionData.values.x - this.tank.positionData.values.x,
+                y: this.positionData.values.y - this.tank.positionData.values.y
             }
             const base = this.baseAccel;
+
             // still a bit inaccurate, works though
-            let unitDist = (delta.x ** 2 + delta.y ** 2) / Drone.MAX_RESTING_RADIUS;
+            let unitDist = (delta.x ** 2 + delta.y ** 2) / AutoDrone.MAX_RESTING_RADIUS;
             if (unitDist <= 1 && this.restCycle) {
                 this.baseAccel /= 6;
                 this.positionData.angle += 0.01 + 0.012 * unitDist;
             } else {
                 const offset = Math.atan2(delta.y, delta.x) + Math.PI / 2
-                delta.x = this.parent.positionData.values.x + Math.cos(offset) * this.parent.physicsData.values.size * 1.2 - this.positionData.values.x;
-                delta.y = this.parent.positionData.values.y + Math.sin(offset) * this.parent.physicsData.values.size * 1.2 - this.positionData.values.y;
+                delta.x = this.tank.positionData.values.x + Math.cos(offset) * this.tank.physicsData.values.size * 1.2 - this.positionData.values.x;
+                delta.y = this.tank.positionData.values.y + Math.sin(offset) * this.tank.physicsData.values.size * 1.2 - this.positionData.values.y;
                 this.positionData.angle = Math.atan2(delta.y, delta.x);
                 if (unitDist < 0.5) this.baseAccel /= 3;
-                this.restCycle = (delta.x ** 2 + delta.y ** 2) <= 4 * (this.parent.physicsData.values.size ** 2);
+                this.restCycle = (delta.x ** 2 + delta.y ** 2) <= 4 * (this.tank.physicsData.values.size ** 2);
             }
 
             if (!Entity.exists(this.barrelEntity)) this.destroy();

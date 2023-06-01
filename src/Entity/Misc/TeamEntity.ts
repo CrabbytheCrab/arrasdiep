@@ -42,7 +42,9 @@ export const ColorsTeamName: { [K in Color]?: string } = {
     [Color.Box]: "MAZE",
     [Color.EnemyTank]: "ENEMY",
     [Color.NecromancerSquare]: "SUNCHIP",
-    [Color.Fallen]: "FALLEN"
+    [Color.Fallen]: "FALLEN",
+    [Color.White]: "WHITE",
+
 }
 
 export class TeamEntity extends Entity implements TeamGroupEntity {

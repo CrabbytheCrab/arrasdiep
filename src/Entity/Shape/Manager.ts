@@ -25,6 +25,7 @@ import Triangle from "./Triangle";
 import Square from "./Square";
 import AbstractShape from "./AbstractShape";
 import { removeFast } from "../../util";
+import Egg from "./Egg";
 
 /**
  * Used to balance out shape count in the arena, as well
@@ -78,18 +79,33 @@ export default class ShapeManager {
                 shape.positionData.values.x = x;
                 shape.positionData.values.y = y;
                 shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
-            } else if (rand < .20) { // < 16%
+            } else if (rand < .14) { // < 10%
                 shape = new Triangle(this.game);
 
                 shape.positionData.values.x = x;
                 shape.positionData.values.y = y;
                 shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
-            } else { // if rand < 80%
+            } else if (rand < .84) { // if rand < 70%
                 shape = new Square(this.game);
 
                 shape.positionData.values.x = x;
                 shape.positionData.values.y = y;
                 shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            } else{ // if rand < 40%
+                shape = new Egg(this.game);
+
+                shape.positionData.values.x = x;
+                shape.positionData.values.y = y;
+                shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            for(let i = 0; i < 1 + (Math.random() * 6); ++i) {
+                shape = new Egg(this.game);
+
+                shape.positionData.values.x = x;
+                shape.positionData.values.y = y;
+                shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+                shape.scoreReward *= this.arena.shapeScoreRewardMultiplier;
+
+                }
             }
         }
 

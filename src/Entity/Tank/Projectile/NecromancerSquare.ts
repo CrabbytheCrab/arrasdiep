@@ -18,29 +18,33 @@
 
 import Barrel from "../Barrel";
 import Drone from "./Drone";
+import * as util from "../../../util";
 
 import { Color, PhysicsFlags, Tank } from "../../../Const/Enums";
 import { TankDefinition } from "../../../Const/TankDefinitions";
-import { AI } from "../../AI";
+import { AI, AIState } from "../../AI";
 import { BarrelBase } from "../TankBody";
 import AbstractShape from "../../Shape/AbstractShape";
 import LivingEntity from "../../Live";
+import ObjectEntity from "../../Object";
 
 /**
  * The drone class represents the drone (projectile) entity in diep.
  */
 export default class NecromancerSquare extends Drone {
+    public static INVIS_RADIUS = 825 ** 2;
+
     public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number) {
         super(barrel, tank, tankDefinition, shootAngle);
 
         const bulletDefinition = barrel.definition.bullet;
-        
         this.ai = new AI(this);
         this.ai.viewRange = 900;
 
         this.physicsData.values.sides = 4;
+        this.physicsData.values.size = 55 * Math.SQRT1_2;
         // this.physics.values.size = 55 * Math.SQRT1_2 * bulletDefinition.sizeRatio;
-
+        this.tank.DroneCount += 1;
         // if (shape.isShiny) this.health.values.maxHealth = this.health.values.health *= 10
         this.styleData.values.color = tank.relationsData.values.team?.teamData?.values.teamColor || Color.NecromancerSquare;
         if (this.physicsData.values.flags & PhysicsFlags.noOwnTeamCollision) this.physicsData.values.flags ^= PhysicsFlags.noOwnTeamCollision;
@@ -59,7 +63,7 @@ export default class NecromancerSquare extends Drone {
         this.physicsData.values.pushFactor = 4;
         this.physicsData.values.absorbtionFactor = bulletDefinition.absorbtionFactor;
 
-        this.baseSpeed = 0;
+        this.baseSpeed /= 3;
     }
 
     /** Given a shape, it will create a necromancer square using stats from the shape */
@@ -72,9 +76,34 @@ export default class NecromancerSquare extends Drone {
         sunchip.positionData.values.angle = shape.positionData.values.angle;
         
         const shapeDamagePerTick: number = shape['damagePerTick'];
+        sunchip.baseSpeed = 0;
 
         sunchip.damagePerTick *= shapeDamagePerTick / 8;
         sunchip.healthData.values.maxHealth = (sunchip.healthData.values.health *= (shapeDamagePerTick / 8));
         return sunchip;
+    }
+    public destroy(animate=true) {
+        if (!animate) this.tank.DroneCount -= 1;
+
+        super.destroy(animate);
+    }
+
+    public tick(tick: number) {
+        super.tick(tick);
+        const dist = (this.positionData.x - this.tank.positionData.x) ** 2 + (this.positionData.y - this.tank.positionData.y) ** 2
+        if (this.tankDefinition && this.tankDefinition.id === Tank.Maleficitor) {
+            //if(this.restCycle == false)this.styleData.opacity += 0.08;
+          /*  if(this.ai.state !== AIState.idle && this.ai.target != this.tank || this.tank.inputs.attemptingShot() || this.tank.inputs.attemptingRepel())this.styleData.opacity += 0.13;
+            this.styleData.opacity -= 0.03
+            this.styleData.opacity = util.constrain(this.styleData.values.opacity, 0, 1);*/
+            //if(dist < NecromancerSquare.INVIS_RADIUS)this.styleData.opacity += 0.13;
+            if (dist > NecromancerSquare.INVIS_RADIUS / 2 || this.tank.inputs.attemptingShot() || this.tank.inputs.attemptingRepel() || this.ai.state == AIState.hasTarget) { // Half
+            setTimeout(() => {
+                this.styleData.opacity += 0.05}, 45)
+                this.movementAngle = this.positionData.values.angle + Math.PI;
+            } else this.styleData.opacity -= 0.025
+            //this.styleData.opacity -= 0.03
+            this.styleData.opacity = util.constrain(this.styleData.values.opacity, 0, 1);
+        }
     }
 }

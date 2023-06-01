@@ -37,6 +37,18 @@ import CrocSkimmer from "./Projectile/CrocSkimmer";
 import { BarrelAddon, BarrelAddonById } from "./BarrelAddons";
 import { Swarm } from "./Projectile/Swarm";
 import NecromancerSquare from "./Projectile/NecromancerSquare";
+import Block from "./Projectile/Block";
+import Launrocket from "./Projectile/Launrocket";
+import Shotgun from "./Projectile/ShotGun";
+import Hive from "./Projectile/Hive";
+import AutoDrone from "./Projectile/AutoDrone";
+import NecromancerEgg from "./Projectile/NecromancerEgg";
+import Boomer from "./Projectile/Boomer";
+import EngiBlock from "./Projectile/EngiBlock";
+import CombinePillBox from "./Projectile/CombineBlock";
+import Spinner from "./Projectile/Conglom";
+import Conglom from "./Projectile/Conglom";
+import MegaSpinner from "./Projectile/MegaSpinner";
 /**
  * Class that determines when barrels can shoot, and when they can't.
  */
@@ -61,7 +73,9 @@ export class ShootCycle {
             this.reloadTime = reloadTime;
         }
 
-        const alwaysShoot = (this.barrelEntity.definition.forceFire) || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'minion');
+        const alwaysShoot = (this.barrelEntity.definition.forceFire) ||(this.barrelEntity.definition.bullet.type === 'eggdrone') ||(this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'autodrone') || (this.barrelEntity.definition.bullet.type === 'minion');
+        const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'eggdrone');
+        //const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone');
 
         if (this.pos >= reloadTime) {
             // When its not shooting dont shoot, unless its a drone
@@ -70,7 +84,11 @@ export class ShootCycle {
                 return;
             }
             // When it runs out of drones, dont shoot
-            if (typeof this.barrelEntity.definition.droneCount === 'number' && this.barrelEntity.droneCount >= this.barrelEntity.definition.droneCount) {
+            if (!necroShoot && typeof this.barrelEntity.definition.droneCount === 'number' && this.barrelEntity.droneCount >= this.barrelEntity.definition.droneCount) {
+                this.pos = reloadTime;
+                return;
+            }
+            if (necroShoot && typeof this.barrelEntity.tank.MAXDRONES === 'number' && this.barrelEntity.tank.DroneCount >= this.barrelEntity.tank.MAXDRONES) {
                 this.pos = reloadTime;
                 return;
             }
@@ -167,13 +185,29 @@ export default class Barrel extends ObjectEntity {
 
         switch (this.definition.bullet.type) {
             case "skimmer":
-                new Skimmer(this, this.tank, tankDefinition, angle, this.tank.inputs.attemptingRepel() ? -Skimmer.BASE_ROTATION : Skimmer.BASE_ROTATION);
+                new MegaSpinner(this, this.tank, tankDefinition, angle, this.tank.inputs.attemptingRepel() ? -MegaSpinner.BASE_ROTATION : MegaSpinner.BASE_ROTATION);
+                break;
+            case "conglom":
+                new Conglom(this, this.tank, tankDefinition, angle, this.tank.inputs.attemptingRepel() ? -Conglom.BASE_ROTATION : Conglom.BASE_ROTATION);
+                break;
+            case "glider":
+                new Skimmer(this, this.tank, tankDefinition, angle);
                 break;
             case "rocket":
                 new Rocket(this, this.tank, tankDefinition, angle);
                 break;
+            case "launchrocket":
+                new Launrocket(this, this.tank, tankDefinition, angle);
+                break;
+            case 'shotgun': {
+                for (let i = 0; i < 9; ++i) {
+                const scatterAngle = (Math.PI / 180) * this.definition.bullet.scatterRate * (Math.random() - .5) * 10;
+                const bullet = new Shotgun(this, this.tank, tankDefinition, this.definition.angle + scatterAngle + this.tank.positionData.values.angle);
+                }
+                break;
+            }
             case 'bullet': {
-                const bullet = new Bullet(this, this.tank, tankDefinition, angle);
+                const bullet = new Bullet(this, this.tank, tankDefinition, angle,this.rootParent);
 
                 if (tankDefinition && (tankDefinition.id === Tank.ArenaCloser || tankDefinition.id === DevTank.Squirrel)) bullet.positionData.flags |= PositionFlags.canMoveThroughWalls;
                 break;
@@ -182,13 +216,19 @@ export default class Barrel extends ObjectEntity {
                 new Trap(this, this.tank, tankDefinition, angle);
                 break;
             case 'drone':
-                new Drone(this, this.tank, tankDefinition, angle);
+                new Drone(this, this.tank, tankDefinition, angle,this.rootParent);
                 break;
             case 'necrodrone':
                 new NecromancerSquare(this, this.tank, tankDefinition, angle);
                 break;
+            case 'eggdrone':
+                new NecromancerEgg(this, this.tank, tankDefinition, angle);
+                break;
             case 'swarm':
                 new Swarm(this, this.tank, tankDefinition, angle);
+                break;
+            case 'hive':
+                new Hive(this, this.tank, tankDefinition, angle);
                 break;
             case 'minion':
                 new Minion(this, this.tank, tankDefinition, angle);
@@ -205,6 +245,21 @@ export default class Barrel extends ObjectEntity {
             }
             case "croc": 
                 new CrocSkimmer(this, this.tank, tankDefinition, angle);
+                break;
+            case "autodrone": 
+                new AutoDrone(this, this.tank, tankDefinition, angle);
+                break;
+            case "block": 
+                new Block(this, this.tank, tankDefinition, angle,this.rootParent);
+                break;
+            case "boomer": 
+                new Boomer(this, this.tank, tankDefinition, angle,this.rootParent);
+                break;
+            case "engi": 
+                new EngiBlock(this, this.tank, tankDefinition, angle,this.rootParent);
+                break;
+            case "assblock": 
+                new CombinePillBox(this, this.tank, tankDefinition, angle,this.rootParent);
                 break;
             default:
                 util.log('Ignoring attempt to spawn projectile of type ' + this.definition.bullet.type);
@@ -234,7 +289,7 @@ export default class Barrel extends ObjectEntity {
         this.relationsData.values.team = this.tank.relationsData.values.team;
 
         if (!this.tank.rootParent.deletionAnimation){
-            this.attemptingShot = this.tank.inputs.attemptingShot();
+            this.attemptingShot = this.definition.inverseFire? this.tank.inputs.attemptingRepel() : this.tank.inputs.attemptingShot();
             this.shootCycle.tick();
         }
 
