@@ -86,39 +86,36 @@ export default class CombinePillBox extends Bullet implements BarrelBase {
     public tick(tick: number) {
         super.tick(tick);
         const delta = {
-            x: this.XMouse - this.positionData.values.x,
-            y: this.YMouse - this.positionData.values.y
+            x: (this.XMouse - this.positionData.values.x) ,
+            y: (this.YMouse - this.positionData.values.y)
         }
-        this.positionData.angle +=  util.constrain(util.constrain(this.velocity.angleComponent(this.movementAngle) * .05, 0, 0.5) - util.constrain(this.velocity.magnitude, 0, 0.2) * 0.5, 0, 0.8);
+        if(this.tic != 0){
+            this.positionData.angle +=  util.constrain(util.constrain(this.velocity.angleComponent(this.movementAngle) * .05, 0, 0.5) - util.constrain(this.velocity.magnitude, 0, 0.2) * 0.5, 0, 0.8);
+        }
         //this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.1
-        if(this.tic > 0){
-            if(tick - this.spawnTick >= (this.lifeLength/32)){
+        if(this.tic >= 0){
+            if(tick - this.spawnTick >= (this.lifeLength/50)){
                 this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.75
             }
         }
         let dist = (delta.x ** 2 + delta.y ** 2) / CombinePillBox.MAX_RESTING_RADIUS;
-
-        if(this.tic > 0){
             const collidedEntities = this.findCollisions();
             for (let i = 0; i < collidedEntities.length; ++i) {
                 let box = collidedEntities[i] 
                 if (box instanceof CombinePillBox){
-                    if(box.tic == 0 && box.relationsData.owner == this.relationsData.owner && (this.combine + box.combine) < 12){
+                    if(this.velocity.magnitude > box.velocity.magnitude && box.relationsData.owner == this.relationsData.owner && (this.combine + box.combine) < 12){
                         box.destroy()
-                        this.physicsData.size = (box.physicsData.size + this.physicsData.size) * 0.75
+                        this.physicsData.size += (box.physicsData.size * 0.75)
                         this.damagePerTick += box.damagePerTick/4
                         this.healthData.maxHealth += box.healthData.maxHealth/4
                         this.healthData.health += box.healthData.health/4
                         this.combine += 1 + box.combine
-                    }
                 }
             }
         }
         if(this.tic == 0){
             this.baseAccel = 0;
             this.baseSpeed = 0;
-            this.velocity.x = 0
-            this.velocity.y = 0
            // if (this.physicsData.values.flags & PhysicsFlags.onlySameOwnerCollision) this.physicsData.flags ^= PhysicsFlags.onlySameOwnerCollision;
             //this.physicsData.values.flags |= PhysicsFlags.noOwnTeamCollision;
         }

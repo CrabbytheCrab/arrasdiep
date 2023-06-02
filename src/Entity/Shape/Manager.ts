@@ -26,6 +26,8 @@ import Square from "./Square";
 import AbstractShape from "./AbstractShape";
 import { removeFast } from "../../util";
 import Egg from "./Egg";
+import AlphaPentagon from "./AlphaPentagon";
+import { Sentry } from "./Sentry";
 
 /**
  * Used to balance out shape count in the arena, as well
@@ -56,20 +58,38 @@ export default class ShapeManager {
         const leftX = this.arena.arenaData.values.leftX;
         if (Math.max(x, y) < rightX / 10 && Math.min(x, y) > leftX / 10) {
             // Pentagon Nest
-            shape = new Pentagon(this.game, Math.random() <= 0.05);
+            const rand = Math.random();
+            if (rand < .05) {
+                shape = new AlphaPentagon(this.game);
+
+                shape.positionData.values.x = x;
+                shape.positionData.values.y = y;
+                shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            }else{
+            shape = new Pentagon(this.game, Math.random() <= 0.1);
 
             shape.positionData.values.x = x;
             shape.positionData.values.y = y;
             shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            }
         } else if (Math.max(x, y) < rightX / 5 && Math.min(x, y) > leftX / 5) {
             // Crasher Zone
             const isBig = Math.random() < .2;
+            const rand = Math.random();
 
-            shape = new Crasher(this.game, isBig);
+            if (rand < .1) {
+                shape = new Sentry(this.game, false);
             
-            shape.positionData.values.x = x;
-            shape.positionData.values.y = y;
-            shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+                shape.positionData.values.x = x;
+                shape.positionData.values.y = y;
+                shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            }else{
+                shape = new Crasher(this.game, isBig);
+            
+                shape.positionData.values.x = x;
+                shape.positionData.values.y = y;
+                shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
+            }
         } else {
             // Fields of Shapes
             const rand = Math.random();

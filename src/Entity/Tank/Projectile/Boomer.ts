@@ -60,7 +60,8 @@ export default class Boomer extends Bullet {
         //this.baseAccel = 0;
         this.physicsData.values.sides = bulletDefinition.sides ?? 5;
 
-        //this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
+        if (this.physicsData.values.flags & PhysicsFlags.noOwnTeamCollision) this.physicsData.values.flags ^= PhysicsFlags.noOwnTeamCollision;
+        this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
         this.styleData.values.flags &= ~StyleFlags.hasNoDmgIndicator;
         this.angles = Math.atan2(( this.YMouse - this.positionData.values.y), (this.XMouse - this.positionData.values.x));
         this.collisionEnd = this.lifeLength >> 3;
@@ -78,13 +79,15 @@ export default class Boomer extends Bullet {
     public tick(tick: number) {
         super.tick(tick);
         const delta = {
-            x: this.XMouse - this.positionData.values.x,
-            y: this.YMouse - this.positionData.values.y
+            x: (this.XMouse - this.positionData.values.x) ,
+            y: (this.YMouse - this.positionData.values.y)
         }
+        if(this.tic != 0 || this.boom2 == true){
         this.positionData.angle +=  util.constrain(util.constrain(this.velocity.angleComponent(this.velocity.angle) * .05, 0, 0.5) - util.constrain(this.velocity.magnitude, 0, 0.2) * 0.5, 0, 0.8);
+        }
         //this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.1
         if(this.tic > 0){
-            if(tick - this.spawnTick >= (this.lifeLength/32)){
+            if(tick - this.spawnTick >= (this.lifeLength/50)){
                 this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.75
             }
         }
@@ -98,14 +101,14 @@ export default class Boomer extends Bullet {
             this.baseSpeed = 0;
             this.boom3 = true
             }
-            if (this.physicsData.values.flags & PhysicsFlags.onlySameOwnerCollision) this.physicsData.flags ^= PhysicsFlags.onlySameOwnerCollision;
-            this.physicsData.values.flags |= PhysicsFlags.noOwnTeamCollision;
+            //if (this.physicsData.values.flags & PhysicsFlags.onlySameOwnerCollision) this.physicsData.flags ^= PhysicsFlags.onlySameOwnerCollision;
+            //this.physicsData.values.flags |= PhysicsFlags.noOwnTeamCollision;
 
             if(tick - this.spawnTick >= this.lifeLength/4 && this.boom == false){
                 if(this.boom2 == false){
                     this.boom2 = true
-                this.baseAccel = this.acce
-            this.baseSpeed = this.speed}
+                this.baseAccel = this.acce/2
+            this.baseSpeed = this.speed/2}
                 const delta = {
                     x: this.positionData.values.x - this.parent.positionData.values.x,
                     y: this.positionData.values.y - this.parent.positionData.values.y

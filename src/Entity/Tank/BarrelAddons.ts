@@ -179,6 +179,92 @@ export class MinionLauncherAddon extends BarrelAddon {
     }
 }
 
+
+export class SwarmMinionLauncher extends ObjectEntity {
+    /** The barrel that this trap launcher is placed on. */
+    public barrelEntity: Barrel;
+
+    /** Resizes the trap launcher; when its barrel owner gets bigger, the trap launcher must as well. */
+    public constructor(barrel: Barrel) {
+        super(barrel.game);
+
+        this.barrelEntity = barrel;
+        this.setParent(barrel);
+        this.relationsData.values.team = barrel;
+        this.physicsData.values.flags = PhysicsFlags._unknown;
+        this.styleData.values.color = Color.Barrel;
+        this.styleData.values.flags|= StyleFlags.showsAboveParent;
+
+        this.physicsData.values.sides = 2;
+        this.physicsData.values.width = barrel.physicsData.values.width* 1.35;
+        this.physicsData.values.size = barrel.physicsData.values.size * (12.5 / 50);
+        this.positionData.values.x = (barrel.physicsData.values.size + this.physicsData.values.size) / 2;
+    }
+
+    public resize() {
+        this.physicsData.sides = 2;
+        this.physicsData.width = this.barrelEntity.physicsData.values.width * 1.35;
+        this.physicsData.size = this.barrelEntity.physicsData.values.size * (12.5 / 50);
+        this.positionData.x = (this.barrelEntity.physicsData.values.size + this.physicsData.values.size) / 2;
+    }
+
+
+    public tick(tick: number) {
+        super.tick(tick);
+
+        this.resize();
+    }
+}
+
+export class SwarmMinionLauncher2 extends ObjectEntity {
+    /** The barrel that this trap launcher is placed on. */
+    public barrelEntity: Barrel;
+
+    /** Resizes the trap launcher; when its barrel owner gets bigger, the trap launcher must as well. */
+    public constructor(barrel: Barrel) {
+        super(barrel.game);
+
+        this.barrelEntity = barrel;
+        this.setParent(barrel);
+        this.relationsData.values.team = barrel;
+        this.physicsData.values.flags = PhysicsFlags._unknown | PhysicsFlags.isTrapezoid;
+        this.styleData.values.color = Color.Barrel;
+        this.styleData.values.flags|= StyleFlags.showsAboveParent ;
+        this.positionData.angle += Math.PI
+        this.physicsData.values.sides = 2;
+        this.physicsData.values.width = barrel.physicsData.values.width* 1.25;
+        this.physicsData.values.size = barrel.physicsData.values.size * (42.5 / 50);
+        this.positionData.values.x = (-barrel.physicsData.values.size + this.physicsData.values.size) / 2;
+
+    }
+
+    public resize() {
+        this.physicsData.sides = 2;
+        this.physicsData.width = this.barrelEntity.physicsData.values.width * 1.25;
+        this.physicsData.size = this.barrelEntity.physicsData.values.size * (42.5 / 50);
+        this.positionData.x = (-this.barrelEntity.physicsData.size + this.physicsData.size) / 2;
+
+    }
+
+
+    public tick(tick: number) {
+        super.tick(tick);
+
+        this.resize();
+    }
+}
+
+export class SwarmMinionLauncherAddon extends BarrelAddon {
+    /** The actual trap launcher entity */
+    public launcherEntity: MinionLauncher;
+
+    public constructor(owner: Barrel) {
+        super(owner);
+        this.launcherEntity = new SwarmMinionLauncher(owner);
+        this.launcherEntity = new SwarmMinionLauncher2(owner);
+    }
+}
+
 export class BuilderLauncher extends ObjectEntity {
     /** The barrel that this trap launcher is placed on. */
     public barrelEntity: Barrel;
@@ -411,5 +497,6 @@ export class AssLauncherAddon extends BarrelAddon {
     minionLauncher: MinionLauncherAddon,
     builderLauncher: BuilderLauncherAddon,
     assLauncher : AssLauncherAddon,
-    engiLauncher: EngiLauncherAddon
+    engiLauncher: EngiLauncherAddon,
+    swarmLauncher : SwarmMinionLauncherAddon
 }

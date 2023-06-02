@@ -49,6 +49,8 @@ import CombinePillBox from "./Projectile/CombineBlock";
 import Spinner from "./Projectile/Conglom";
 import Conglom from "./Projectile/Conglom";
 import MegaSpinner from "./Projectile/MegaSpinner";
+import MegaMinion from "./Projectile/MegaMinion";
+import SwarmMinion from "./Projectile/SwarmMinion";
 /**
  * Class that determines when barrels can shoot, and when they can't.
  */
@@ -73,7 +75,7 @@ export class ShootCycle {
             this.reloadTime = reloadTime;
         }
 
-        const alwaysShoot = (this.barrelEntity.definition.forceFire) ||(this.barrelEntity.definition.bullet.type === 'eggdrone') ||(this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'autodrone') || (this.barrelEntity.definition.bullet.type === 'minion');
+        const alwaysShoot = (this.barrelEntity.definition.forceFire) || (this.barrelEntity.definition.bullet.type === 'megaminion') ||(this.barrelEntity.definition.bullet.type === 'eggdrone') ||(this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'autodrone') || (this.barrelEntity.definition.bullet.type === 'minion');
         const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'eggdrone');
         //const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone');
 
@@ -232,6 +234,12 @@ export default class Barrel extends ObjectEntity {
                 break;
             case 'minion':
                 new Minion(this, this.tank, tankDefinition, angle);
+                break;
+            case 'megaminion':
+                new MegaMinion(this, this.tank, tankDefinition, angle);
+                break;
+            case 'swarmminion':
+                new SwarmMinion(this, this.tank, tankDefinition, angle);
                 break;
             case 'flame':
                 new Flame(this, this.tank, tankDefinition, angle);

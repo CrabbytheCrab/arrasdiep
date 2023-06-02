@@ -24,32 +24,30 @@ import { Color } from "../../Const/Enums";
 /**
  * Pentagon entity class.
  */
-export default class Pentagon extends AbstractShape {
+export default class AlphaPentagon extends AbstractShape {
     /** If the pentagon is an alpha pentagon or not */
-    public isAlpha: boolean;
 
     protected static BASE_ROTATION = AbstractShape.BASE_ROTATION / 2;
     protected static BASE_ORBIT = AbstractShape.BASE_ORBIT / 2;
     protected static BASE_VELOCITY = AbstractShape.BASE_VELOCITY / 2;
 
-    public constructor(game: GameServer, isAlpha=false, shiny=(Math.random() < 0.000001) && !isAlpha) {
+    public constructor(game: GameServer, shiny=(Math.random() < 0.000001)) {
         super(game);
         
-        this.nameData.values.name = isAlpha ? "Beta Pentagon" : "Pentagon";
+        this.nameData.values.name = "Alpha Pentagon";
 
-        this.healthData.values.health = this.healthData.values.maxHealth = (isAlpha ? 3000 : 100);
-        this.physicsData.values.size = (isAlpha ? 150 : 75) * Math.SQRT1_2;
+        this.healthData.values.health = this.healthData.values.maxHealth = 10000;
+        this.physicsData.values.size = 400 * Math.SQRT1_2;
         this.physicsData.values.sides = 5;
         this.styleData.values.color = shiny ? Color.Shiny : Color.EnemyPentagon;
 
-        this.physicsData.values.absorbtionFactor = isAlpha ? 0.05 : 0.5;
+        this.physicsData.values.absorbtionFactor = 0.05;
         this.physicsData.values.pushFactor = 11;
 
-        this.isAlpha = isAlpha;
         this.isShiny = shiny;
 
-        this.damagePerTick = isAlpha ? 20 : 12;
-        this.scoreReward = isAlpha ? 3000 : 130;
+        this.damagePerTick = 20;
+        this.scoreReward = 10000;
         
         if (shiny) {
             this.scoreReward *= 100;

@@ -52,8 +52,8 @@ export default class PillBox extends Bullet {
         this.baseSpeed = (barrel.bulletAccel / 2) + 30 - Math.random() * barrel.definition.bullet.scatterRate;
         //this.baseAccel = 0;
         this.physicsData.values.sides = bulletDefinition.sides ?? 4;
-
-        //this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
+        if (this.physicsData.values.flags & PhysicsFlags.noOwnTeamCollision) this.physicsData.values.flags ^= PhysicsFlags.noOwnTeamCollision;
+        this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
         this.styleData.values.flags |= StyleFlags.isStar;
         this.styleData.values.flags &= ~StyleFlags.hasNoDmgIndicator;
         this.angles = Math.atan2(( this.YMouse - this.positionData.values.y), (this.XMouse - this.positionData.values.x));
@@ -72,13 +72,15 @@ export default class PillBox extends Bullet {
     public tick(tick: number) {
         super.tick(tick);
         const delta = {
-            x: this.XMouse - this.positionData.values.x,
-            y: this.YMouse - this.positionData.values.y
+            x: (this.XMouse - this.positionData.values.x) ,
+            y: (this.YMouse - this.positionData.values.y)
         }
-        this.positionData.angle +=  util.constrain(util.constrain(this.velocity.angleComponent(this.movementAngle) * .05, 0, 0.5) - util.constrain(this.velocity.magnitude, 0, 0.2) * 0.5, 0, 0.8);
+        if(this.tic != 0){
+            this.positionData.angle +=  util.constrain(util.constrain(this.velocity.angleComponent(this.movementAngle) * .05, 0, 0.5) - util.constrain(this.velocity.magnitude, 0, 0.2) * 0.5, 0, 0.8);
+        }
         //this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.1
-        if(this.tic > 0){
-            if(tick - this.spawnTick >= (this.lifeLength/32)){
+        if(this.tic >= 0){
+            if(tick - this.spawnTick >= (this.lifeLength/50)){
                 this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.75
             }
         }
@@ -88,8 +90,6 @@ export default class PillBox extends Bullet {
         if(this.tic == 0){
             this.baseAccel = 0;
             this.baseSpeed = 0;
-            this.velocity.x = 0
-            this.velocity.y = 0
             if (this.physicsData.values.flags & PhysicsFlags.onlySameOwnerCollision) this.physicsData.flags ^= PhysicsFlags.onlySameOwnerCollision;
             this.physicsData.values.flags |= PhysicsFlags.noOwnTeamCollision;
         }

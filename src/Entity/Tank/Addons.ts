@@ -491,9 +491,9 @@ const MegaAutoTurretMiniDefinition: BarrelDefinition = {
 
 const AutoTurretMiniDefinition2: BarrelDefinition = {
     angle: 0,
-    offset: -9,
-    size: 40,
-    width: 42 * 0.35,
+    offset: -13,
+    size: 45,
+    width: 42 * 0.5,
     delay: 0.01,
     reload: 1,
     recoil: 0.05,
@@ -531,15 +531,15 @@ const BlockAutoTurretMiniDefinition: BarrelDefinition = {
         scatterRate: 1,
         lifeLength: 2,
         sizeRatio: 0.8,
-        absorbtionFactor: 1
+        absorbtionFactor: 0.4
     }
 };
 
 const AutoTurretMiniDefinition3: BarrelDefinition = {
     angle: 0,
-    offset: 9,
-    size: 40,
-    width: 42 * 0.35,
+    offset: 13,
+    size: 45,
+    width: 42 * 0.5,
     delay: 0.51,
     reload: 1,
     recoil: 0.05,
@@ -789,8 +789,8 @@ class Auto3Addon extends Addon {
         super(owner);
         if(this.owner instanceof TankBody){
             if(this.owner.currentTank == Tank.banshee){
-                this.createAutoTurrets2(3);
                 this.createDrones(3);
+                this.createAutoTurrets2(3);
             }else{
                 this.createAutoTurrets(3);
             }

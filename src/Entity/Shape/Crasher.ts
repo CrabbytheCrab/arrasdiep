@@ -34,7 +34,7 @@ export default class Crasher extends AbstractShape {
     /** Whether or not the crasher is large. */
     public isLarge: boolean;
     /** The max speed the crasher can move when targetting a player.s */
-    private targettingSpeed: number;
+    public targettingSpeed: number;
 
     public constructor(game: GameServer, large=false) {
         super(game);
