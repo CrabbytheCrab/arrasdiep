@@ -29,10 +29,10 @@ export type preAddonId = "dombase" | "launcher"
 export type addonId = preAddonId | postAddonId;
 
 /** The types of projectiles in the game */
-export type projectileId = "conglom"|"glider"|"assblock"|"engi"|"boomer"|"eggdrone"| "autodrone"|"bullet" | "drone" | "trap"| "hive"| "block" | "launchrocket"| "shotgun"|"necrodrone" | "minion" | "skimmer" | "rocket" | "swarm" | "flame" | "wall" | "croc";
+export type projectileId = "swarmminion"|"megaminion"|"conglom"|"glider"|"assblock"|"engi"|"boomer"|"eggdrone"| "autodrone"|"bullet" | "drone" | "trap"| "hive"| "block" | "launchrocket"| "shotgun"|"necrodrone" | "minion" | "skimmer" | "rocket" | "swarm" | "flame" | "wall" | "croc";
 
 /** The types of barrel addons that exist in the game */
-export type barrelAddonId = "trapLauncher" | "minionLauncher" | "builderLauncher"  | "assLauncher"  | "engiLauncher";
+export type barrelAddonId = "trapLauncher" | "minionLauncher" | "builderLauncher"  | "assLauncher"  | "engiLauncher" | "swarmLauncher";
 
 /** Increase in opacity when taking damage. */
 export const visibilityRateDamage = 0.2;

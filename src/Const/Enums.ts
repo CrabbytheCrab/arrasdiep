@@ -194,6 +194,8 @@ export const enum Tank {
     Spike         = 116,
     autoSmasher   = 117,
     Landmine      = 118,
+    MegaSpawner   = 119,
+    Productionist = 120,
     DominatorD    = 10000,
     DominatorG    = 10000,
     DominatorT    = 10000,
