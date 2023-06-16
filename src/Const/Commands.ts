@@ -2,9 +2,17 @@ import Client from "../Client"
 import { AccessLevel, maxPlayerLevel } from "../config";
 import AbstractBoss from "../Entity/Boss/AbstractBoss";
 import Defender from "../Entity/Boss/Defender";
+import EliteBattleship from "../Entity/Boss/EliteBattleship";
+import EliteDestroyer from "../Entity/Boss/EliteDestroyer";
+import EliteGlider from "../Entity/Boss/EliteGlider";
+import EliteGunner from "../Entity/Boss/EliteGunner";
+import EliteSpawner from "../Entity/Boss/EliteSpawner";
+import EliteSprayer from "../Entity/Boss/EliteSprayer";
 import FallenBooster from "../Entity/Boss/FallenBooster";
 import FallenOverlord from "../Entity/Boss/FallenOverlord";
 import Guardian from "../Entity/Boss/Guardian";
+import NestKeeper from "../Entity/Boss/NestKeeper";
+import RoguePalisade from "../Entity/Boss/RoguePalisade";
 import Summoner from "../Entity/Boss/Summoner";
 import LivingEntity from "../Entity/Live";
 import ArenaCloser from "../Entity/Misc/ArenaCloser";
@@ -123,7 +131,7 @@ export const commandDefinitions = {
         id: CommandID.adminSummon,
         usage: "[entityName] [?count] [?x] [?y]",
         description: "Spawns entities at a certain location",
-        permissionLevel: AccessLevel.FullAccess,
+        permissionLevel: AccessLevel.BetaAccess,
         isCheat: false
     },
     admin_kill_all: {
@@ -260,6 +268,14 @@ export const commandCallbacks = {
         const game = client.camera?.game;
         const TEntity = new Map([
             ["Defender", Defender],
+            ["EliteGlider", EliteGlider],
+            ["EliteDestroyer", EliteDestroyer],
+            ["EliteGunner", EliteGunner],
+            ["EliteSprayer", EliteSprayer],
+            ["EliteSpawner", EliteSpawner],
+            ["NestKeeper", NestKeeper],
+            ["RoguePalisade", RoguePalisade],
+            ["EliteBattleship", EliteBattleship],
             ["Summoner", Summoner],
             ["Guardian", Guardian],
             ["FallenOverlord", FallenOverlord],

@@ -156,7 +156,6 @@ app.listen(PORT, (success) => {
     const sbx = new GameServer("sandbox", "Sandbox");
     
     games.push(ffa, sbx);
-    util.log((15) *(Math.PI/180));
 
     util.saveToLog("Servers up", "All servers booted up.", 0x37F554);
     util.log("Dumping endpoint -> gamemode routing table");

@@ -36,6 +36,13 @@ import FallenOverlord from "../Entity/Boss/FallenOverlord";
 import FallenBooster from "../Entity/Boss/FallenBooster";
 import Defender from "../Entity/Boss/Defender";
 import { bossSpawningInterval } from "../config";
+import EliteBattleship from "../Entity/Boss/EliteBattleship";
+import EliteDestroyer from "../Entity/Boss/EliteDestroyer";
+import EliteGlider from "../Entity/Boss/EliteGlider";
+import EliteGunner from "../Entity/Boss/EliteGunner";
+import EliteSpawner from "../Entity/Boss/EliteSpawner";
+import NestKeeper from "../Entity/Boss/NestKeeper";
+import RoguePalisade from "../Entity/Boss/RoguePalisade";
 
 export const enum ArenaState {
 	/** Alive, open */
@@ -202,8 +209,8 @@ export default class ArenaEntity extends Entity implements TeamGroupEntity {
 
 	/** Spawns the boss into the arena */
 	protected spawnBoss() {
-		const TBoss = [Guardian, Summoner, FallenOverlord, FallenBooster, Defender]
-			[~~(Math.random() * 5)];
+		const TBoss = [EliteBattleship,EliteDestroyer,EliteGlider,EliteGunner,EliteSpawner,EliteSpawner,NestKeeper,RoguePalisade, Summoner, FallenOverlord, FallenBooster, Defender]
+			[~~(Math.random() * 12)];
 		
 		this.boss = new TBoss(this.game);
 	}
