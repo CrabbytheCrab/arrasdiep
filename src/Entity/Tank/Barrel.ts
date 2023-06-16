@@ -51,6 +51,13 @@ import Conglom from "./Projectile/Conglom";
 import MegaSpinner from "./Projectile/MegaSpinner";
 import MegaMinion from "./Projectile/MegaMinion";
 import SwarmMinion from "./Projectile/SwarmMinion";
+import { Blaster } from "./Projectile/Blaster";
+import { Fire } from "./Projectile/Fire";
+import { AccelBullet } from "./Projectile/AccelBullet";
+import BulletAlt from "./Projectile/BulletAtl";
+import BoosterMinion from "./Projectile/BoosterMinion";
+import HyperGlider from "./Projectile/HyperGlider";
+import SentryDrone from "./Projectile/SentryDrone";
 /**
  * Class that determines when barrels can shoot, and when they can't.
  */
@@ -75,7 +82,7 @@ export class ShootCycle {
             this.reloadTime = reloadTime;
         }
 
-        const alwaysShoot = (this.barrelEntity.definition.forceFire) || (this.barrelEntity.definition.bullet.type === 'megaminion') ||(this.barrelEntity.definition.bullet.type === 'eggdrone') ||(this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'autodrone') || (this.barrelEntity.definition.bullet.type === 'minion');
+        const alwaysShoot = (this.barrelEntity.definition.forceFire) || (this.barrelEntity.definition.bullet.type === 'rogueminion') || (this.barrelEntity.definition.bullet.type === 'sentry3') || (this.barrelEntity.definition.bullet.type === 'sentry2') || (this.barrelEntity.definition.bullet.type === 'sentry1') || (this.barrelEntity.definition.bullet.type === 'boosterminion') || (this.barrelEntity.definition.bullet.type === 'megaminion') ||(this.barrelEntity.definition.bullet.type === 'eggdrone') ||(this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'drone') || (this.barrelEntity.definition.bullet.type === 'autodrone') || (this.barrelEntity.definition.bullet.type === 'minion');
         const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone') || (this.barrelEntity.definition.bullet.type === 'eggdrone');
         //const necroShoot = (this.barrelEntity.definition.bullet.type === 'necrodrone');
 
@@ -195,6 +202,9 @@ export default class Barrel extends ObjectEntity {
             case "glider":
                 new Skimmer(this, this.tank, tankDefinition, angle);
                 break;
+            case "hyperglider":
+                new HyperGlider(this, this.tank, tankDefinition, angle);
+                break;
             case "rocket":
                 new Rocket(this, this.tank, tankDefinition, angle);
                 break;
@@ -212,6 +222,31 @@ export default class Barrel extends ObjectEntity {
                 const bullet = new Bullet(this, this.tank, tankDefinition, angle,this.rootParent);
 
                 if (tankDefinition && (tankDefinition.id === Tank.ArenaCloser || tankDefinition.id === DevTank.Squirrel)) bullet.positionData.flags |= PositionFlags.canMoveThroughWalls;
+                break;
+            }
+            case 'heal': {
+                const bullet = new Bullet(this, this.tank, tankDefinition, angle,this.rootParent);
+                if (this.rootParent instanceof TankBody){
+                    this.rootParent.healthData.health += this.rootParent.healthData.maxHealth/10
+                }
+                break;
+            }
+            case 'bulletalt': {
+                const bullet = new BulletAlt(this, this.tank, tankDefinition, angle,this.rootParent);
+
+                if (tankDefinition && (tankDefinition.id === Tank.ArenaCloser || tankDefinition.id === DevTank.Squirrel)) bullet.positionData.flags |= PositionFlags.canMoveThroughWalls;
+                break;
+            }
+            case 'blaster': {
+                const bullet = new Blaster(this, this.tank, tankDefinition, angle);
+                break;
+            }
+            case 'accelbullet': {
+                const bullet = new AccelBullet(this, this.tank, tankDefinition, angle);
+                break;
+            }
+            case 'fire': {
+                const bullet = new Fire(this, this.tank, tankDefinition, angle);
                 break;
             }
             case 'trap':
@@ -233,7 +268,22 @@ export default class Barrel extends ObjectEntity {
                 new Hive(this, this.tank, tankDefinition, angle);
                 break;
             case 'minion':
-                new Minion(this, this.tank, tankDefinition, angle);
+                new Minion(this, this.tank, tankDefinition, angle,0);
+                break;
+            case 'rogueminion':
+                new Minion(this, this.tank, tankDefinition, angle,1);
+                break;
+            case 'sentry1':
+                new SentryDrone(this, this.tank, tankDefinition, angle,0);
+                break;
+            case 'sentry2':
+                new SentryDrone(this, this.tank, tankDefinition, angle,1);
+                break;
+            case 'sentry3':
+                new SentryDrone(this, this.tank, tankDefinition, angle,2);
+                break;
+            case 'boosterminion':
+                new BoosterMinion(this, this.tank, tankDefinition, angle);
                 break;
             case 'megaminion':
                 new MegaMinion(this, this.tank, tankDefinition, angle);

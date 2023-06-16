@@ -148,7 +148,7 @@ export default class TankBody extends LivingEntity implements BarrelBase {
         }
 
         // Size ratios
-        this.baseSize = tank.baseSizeOverride ?? tank.sides === 4 ? Math.SQRT2 * 32.5 : tank.sides === 16 ? Math.SQRT2 * 25 : 50;
+        this.baseSize = tank.baseSizeOverride ??tank.sides === 6 ? Math.SQRT2 * 30 : tank.sides === 4 ? Math.SQRT2 * 32.5 : tank.sides === 16 ? Math.SQRT2 * 25 : 50;
         this.physicsData.absorbtionFactor = this.isInvulnerable ? 0 : tank.absorbtionFactor;
         if (tank.absorbtionFactor === 0) this.positionData.flags |= PositionFlags.canMoveThroughWalls;
         else if (this.positionData.flags & PositionFlags.canMoveThroughWalls) this.positionData.flags ^= PositionFlags.canMoveThroughWalls;
@@ -273,7 +273,11 @@ export default class TankBody extends LivingEntity implements BarrelBase {
     }
 
     public tick(tick: number) {
-        this.positionData.angle = Math.atan2(this.inputs.mouse.y - this.positionData.values.y, this.inputs.mouse.x - this.positionData.values.x);
+        if(this.currentTank == Tank.Prodigy){
+            this.positionData.angle = Math.atan2(this.inputs.mouse.y - this.positionData.values.y, this.inputs.mouse.x - this.positionData.values.x) + (Math.PI/6);
+        }else
+        {
+            this.positionData.angle = Math.atan2(this.inputs.mouse.y - this.positionData.values.y, this.inputs.mouse.x - this.positionData.values.x);}
         if(this._currentTank == Tank.Xhunter && this.bool){
             this.bool = false
             this.fov = this.cameraEntity.cameraData.FOV}
@@ -334,11 +338,14 @@ export default class TankBody extends LivingEntity implements BarrelBase {
         // Update stat related
         updateStats: {
             // Damage
+            if(this._currentTank == Tank.Bonker){
+                this.baseSize = 25 * Math.SQRT2
+            }
             this.damagePerTick = this.cameraEntity.cameraData.statLevels[Stat.BodyDamage] * 6 + 20;
             if (this._currentTank === Tank.Spike) this.damagePerTick *= 1.5;
             if (this._currentTank === Tank.Infestor) (this.MAXDRONES = 44 + (this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload] *4));
 
-            if (this._currentTank === Tank.Maleficitor || this._currentTank === Tank.Underseer) this.MAXDRONES = 11 + this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload];
+            if (this._currentTank === Tank.Maleficitor || this._currentTank === Tank.Underseer || this._currentTank === Tank.Prodigy) this.MAXDRONES = 11 + this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload];
             if (this._currentTank === Tank.Necromancer) this.MAXDRONES = 22 + (this.cameraEntity.cameraData.values.statLevels.values[Stat.Reload] * 2);
             // Max Health
             const maxHealthCache = this.healthData.values.maxHealth;

@@ -48,7 +48,7 @@ const SkimmerBarrelDefinition: BarrelDefinition = {
         speed: 1.4,
         scatterRate: 1,
         lifeLength: -1,
-        sizeRatio: 0.7,
+        sizeRatio: 0.85,
         sides: 4,
         absorbtionFactor: 1
     }

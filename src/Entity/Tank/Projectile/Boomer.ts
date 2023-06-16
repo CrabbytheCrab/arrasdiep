@@ -24,6 +24,8 @@ import { DevTank } from "../../../Const/DevTankDefinitions";
 import { PI2 } from "../../../util";
 import ObjectEntity from "../../Object";
 import LivingEntity from "../../Live";
+import AutoTurret from "../AutoTurret";
+import AbstractBoss from "../../Boss/AbstractBoss";
 
 /**
  * The trap class represents the trap (projectile) entity in diep.
@@ -55,6 +57,10 @@ export default class Boomer extends Bullet {
         if(this.parent instanceof TankBody){
         this.XMouse = this.parent.inputs.mouse.x
         this.YMouse = this.parent.inputs.mouse.y
+        }
+        if(this.parent instanceof AbstractBoss){
+            this.XMouse = this.parent.ai.inputs.mouse.x
+            this.YMouse = this.parent.ai.inputs.mouse.y
         }
         this.baseSpeed = (barrel.bulletAccel / 2) + 30 - Math.random() * barrel.definition.bullet.scatterRate;
         //this.baseAccel = 0;

@@ -76,7 +76,7 @@ export default class Rocket extends Bullet implements BarrelBase {
         this.sizeFactor = this.physicsData.values.size / 50;
 
         const rocketBarrel = this.rocketBarrel = new Barrel(this, {...RocketBarrelDefinition});
-        rocketBarrel.styleData.values.color = this.styleData.values.color;
+        //rocketBarrel.styleData.values.color = this.styleData.values.color;
     }
 
     public tick(tick: number) {

@@ -45,6 +45,9 @@ export default class CombinePillBox extends Bullet implements BarrelBase {
     public reloadTime = 15;
     public cameraEntity: Entity;
     public inputs = new Inputs();
+    public size: number
+    public damage: number
+    public hp:number
     public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number, parent?: ObjectEntity) {
         super(barrel, tank, tankDefinition, shootAngle);
         this.usePosAngle = false;
@@ -55,6 +58,9 @@ export default class CombinePillBox extends Bullet implements BarrelBase {
         this.parent = parent ?? tank;
         this.XMouse = 0
         this.YMouse = 0
+        this.size = this.physicsData.values.size
+        this.damage = this.damagePerTick
+        this.hp = this.healthData.values.maxHealth
         if(this.parent instanceof TankBody){
         this.XMouse = this.parent.inputs.mouse.x
         this.YMouse = this.parent.inputs.mouse.y
@@ -98,6 +104,9 @@ export default class CombinePillBox extends Bullet implements BarrelBase {
                 this.movementAngle +=  (Math.atan2(delta.y, delta.x) - this.movementAngle) * 0.75
             }
         }
+        this.physicsData.size = (this.size * (this.combine/2 + 1))
+        this.damagePerTick = this.damage * (this.combine/2 + 1)
+        this.healthData.maxHealth =  this.hp * (this.combine/4 + 1)
         let dist = (delta.x ** 2 + delta.y ** 2) / CombinePillBox.MAX_RESTING_RADIUS;
             const collidedEntities = this.findCollisions();
             for (let i = 0; i < collidedEntities.length; ++i) {
@@ -105,11 +114,8 @@ export default class CombinePillBox extends Bullet implements BarrelBase {
                 if (box instanceof CombinePillBox){
                     if(this.velocity.magnitude > box.velocity.magnitude && box.relationsData.owner == this.relationsData.owner && (this.combine + box.combine) < 12){
                         box.destroy()
-                        this.physicsData.size += (box.physicsData.size * 0.75)
-                        this.damagePerTick += box.damagePerTick/4
-                        this.healthData.maxHealth += box.healthData.maxHealth/4
-                        this.healthData.health += box.healthData.health/4
                         this.combine += 1 + box.combine
+                        this.healthData.health += box.healthData.health/4
                 }
             }
         }

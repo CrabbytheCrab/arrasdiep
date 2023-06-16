@@ -28,7 +28,7 @@ import ObjectEntity from "../../Object";
 /**
  * The bullet class represents the bullet entity in diep.
  */
-export default class Bullet extends LivingEntity {
+export default class BulletAlt extends LivingEntity {
     /** The barrel that the bullet is being shot from. */
     protected barrelEntity: Barrel;
     /** The tick this entity was created in. */
@@ -98,7 +98,7 @@ export default class Bullet extends LivingEntity {
 
         this.lifeLength = bulletDefinition.lifeLength * 72;
 
-        const {x, y} = tank.getWorldPosition();
+        const {x, y} = barrel.getWorldPosition();
         
         this.positionData.values.x = x + (Math.cos(shootAngle) * barrel.physicsData.values.size) - Math.sin(shootAngle) * barrel.definition.offset * sizeFactor + Math.cos(shootAngle) * (barrel.definition.distance || 0);
         this.positionData.values.y = y + (Math.sin(shootAngle) * barrel.physicsData.values.size) + Math.cos(shootAngle) * barrel.definition.offset * sizeFactor + Math.sin(shootAngle) * (barrel.definition.distance || 0);

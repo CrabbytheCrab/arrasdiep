@@ -35,7 +35,7 @@ import { BarrelBase } from "../TankBody";
     width: 50.4,
     delay: 0,
     reload: 1,
-    recoil: 1.35,
+    recoil: 0.35,
     isTrapezoid: false,
     trapezoidDirection: 0,
     addon: null,
@@ -50,24 +50,95 @@ import { BarrelBase } from "../TankBody";
         absorbtionFactor: 1
     }
 };
-const MinionBarrelDefinition2: BarrelDefinition = {
-    angle: 0,
+
+const MinionBarrelDefinition1: BarrelDefinition = {
+    angle: 3.665191429188092,
     offset: 0,
     size: 80,
-    width: 50.4,
-    delay: 0,
+    width: 42,
+    delay: 0.33,
     reload: 1,
-    recoil: 1.35,
+    recoil: 2.5,
     isTrapezoid: false,
     trapezoidDirection: 0,
     addon: null,
     bullet: {
         type: "bullet",
-        health: 0.8,
-        damage: 0.8,
-        speed: 1.2,
+        health: 0.2,
+        damage: 0.2,
+        speed: 0.8,
         scatterRate: 1,
-        lifeLength: 1,
+        lifeLength: 0.2,
+        sizeRatio: 1,
+        absorbtionFactor: 1
+    }
+};
+
+const MinionBarrelDefinition2: BarrelDefinition = {
+    angle: 2.6179938779914944,
+    offset: 0,
+    size: 80,
+    width: 42,
+    delay: 0.33,
+    reload: 1,
+    recoil: 2.5,
+    isTrapezoid: false,
+    trapezoidDirection: 0,
+    addon: null,
+    bullet: {
+        type: "bullet",
+        health: 0.2,
+        damage: 0.2,
+        speed: 0.8,
+        scatterRate: 1,
+        lifeLength: 0.2,
+        sizeRatio: 1,
+        absorbtionFactor: 1
+    }
+};
+
+
+const MinionBarrelDefinition3: BarrelDefinition = {
+    angle: 3.9269908169872414,
+    offset: 0,
+    size: 70,
+    width: 42,
+    delay: 0.66,
+    reload: 1,
+    recoil: 0.5,
+    isTrapezoid: false,
+    trapezoidDirection: 0,
+    addon: null,
+    bullet: {
+        type: "bullet",
+        health: 0.2,
+        damage: 0.2,
+        speed: 0.8,
+        scatterRate: 1,
+        lifeLength: 0.2,
+        sizeRatio: 1,
+        absorbtionFactor: 1
+    }
+};
+
+const MinionBarrelDefinition4: BarrelDefinition = {
+    angle: 2.356194490192345,
+    offset: 0,
+    size: 70,
+    width: 42,
+    delay: 0.66,
+    reload: 1,
+    recoil: 0.5,
+    isTrapezoid: false,
+    trapezoidDirection: 0,
+    addon: null,
+    bullet: {
+        type: "bullet",
+        health: 0.2,
+        damage: 0.2,
+        speed: 0.8,
+        scatterRate: 1,
+        lifeLength: 0.2,
         sizeRatio: 1,
         absorbtionFactor: 1
     }
@@ -75,9 +146,9 @@ const MinionBarrelDefinition2: BarrelDefinition = {
 /**
  * The drone class represents the minion (projectile) entity in diep.
  */
-export default class Minion extends Drone implements BarrelBase {
+export default class BoosterMinion extends Drone implements BarrelBase {
     /** Size of the focus the minions orbit. */
-    public static FOCUS_RADIUS = 850 ** 2;
+    public static FOCUS_RADIUS = 250 ** 2;
 
     /** The minion's barrel */
     private minionBarrel: Barrel;
@@ -89,10 +160,11 @@ export default class Minion extends Drone implements BarrelBase {
     /** The inputs for when to shoot or not. */
     public inputs = new Inputs();
 
-    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number, mode: number) {
+    public constructor(barrel: Barrel, tank: BarrelBase, tankDefinition: TankDefinition | null, shootAngle: number) {
         super(barrel, tank, tankDefinition, shootAngle);
 
         const bulletDefinition = barrel.definition.bullet;
+
         this.inputs = this.ai.inputs;
         this.ai.viewRange = 900;
         this.usePosAngle = false;
@@ -106,12 +178,12 @@ export default class Minion extends Drone implements BarrelBase {
         this.physicsData.values.flags |= PhysicsFlags.onlySameOwnerCollision;
 
         this.cameraEntity = tank.cameraEntity;
-    if(mode == 1){
-        this.minionBarrel = new Barrel(this, MinionBarrelDefinition2);
 
-    }else{
-            this.minionBarrel = new Barrel(this, MinionBarrelDefinition);
-    }
+        this.minionBarrel = new Barrel(this, MinionBarrelDefinition);
+        this.minionBarrel = new Barrel(this, MinionBarrelDefinition4);
+        this.minionBarrel = new Barrel(this, MinionBarrelDefinition3);
+        this.minionBarrel = new Barrel(this, MinionBarrelDefinition2);
+        this.minionBarrel = new Barrel(this, MinionBarrelDefinition1);
         this.ai.movementSpeed = this.ai.aimSpeed = this.baseAccel;
     }
 
@@ -133,10 +205,10 @@ export default class Minion extends Drone implements BarrelBase {
 
             const dist = inputs.mouse.distanceToSQ(this.positionData.values);
 
-            if (dist < Minion.FOCUS_RADIUS / 4) { // Half
+            if (dist < BoosterMinion.FOCUS_RADIUS / 4) { // Half
                 this.movementAngle = this.positionData.values.angle + Math.PI;
-            } else if (dist < Minion.FOCUS_RADIUS) {
-                this.movementAngle = this.positionData.values.angle + Math.PI / 2;
+            } else if (dist < BoosterMinion.FOCUS_RADIUS) {
+              //  this.movementAngle = this.positionData.values.angle + Math.PI / 2;
             } else this.movementAngle = this.positionData.values.angle;
         }
 

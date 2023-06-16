@@ -117,7 +117,7 @@ export default class ShapeManager {
                 shape.positionData.values.x = x;
                 shape.positionData.values.y = y;
                 shape.relationsData.values.owner = shape.relationsData.values.team = this.arena;
-            for(let i = 0; i < 1 + (Math.random() * 6); ++i) {
+            for(let i = 0; i < 1 + (Math.random() * 3); ++i) {
                 shape = new Egg(this.game);
 
                 shape.positionData.values.x = x;

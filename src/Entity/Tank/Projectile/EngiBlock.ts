@@ -68,7 +68,7 @@ export default class EngiPillBox extends Bullet implements BarrelBase {
             offset: 0,
             size: 65,
             width: 33.6,
-            delay: 0.21,
+            delay: 0.01,
             reload: 3,
             recoil: 0,
             isTrapezoid: false,

@@ -26,7 +26,7 @@ import Triangle from "./Triangle";
 
 export default class Egg extends AbstractShape {
     public timer:number
-    public constructor(game: GameServer, shiny=Math.random() < 0.01) {
+    public constructor(game: GameServer, shiny=Math.random() < 0.0001) {
         super(game);
         this.nameData.values.name = "Egg";
         this.healthData.values.health = this.healthData.values.maxHealth = 5;

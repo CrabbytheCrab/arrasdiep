@@ -77,7 +77,7 @@ export default class Launrocket extends Bullet implements BarrelBase {
 
         this.sizeFactor = this.physicsData.values.size / 50;
         const launrocketBarrel = this.launrocketBarrel = new Barrel(this, {...RocketBarrelDefinition});
-        launrocketBarrel.styleData.values.color = this.styleData.values.color;
+       // launrocketBarrel.styleData.values.color = this.styleData.values.color;
     }
 
     public tick(tick: number) {

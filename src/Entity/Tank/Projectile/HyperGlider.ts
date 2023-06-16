@@ -38,18 +38,18 @@ const RocketBarrelDefinition: BarrelDefinition = {
     size: 70,
     width: 37.8 ,
     delay: 0,
-    reload: 0.8,
+    reload: 0.5,
     recoil: 4.5,
     isTrapezoid: false,
     trapezoidDirection: 0,
     addon: null,
     bullet: {
         type: "bullet",
-        health: 0.5,
-        damage: 0.6,
+        health: 3,
+        damage: 1,
         speed: 1,
         scatterRate: 1,
-        lifeLength: 0.5,
+        lifeLength: 2,
         sizeRatio: 1,
         absorbtionFactor: 1
     }
@@ -62,18 +62,64 @@ const RocketBarrelDefinition2: BarrelDefinition = {
     size: 70,
     width: 37.8 ,
     delay: 0,
-    reload: 0.8,
+    reload: 0.5,
     recoil: 4.5,
     isTrapezoid: false,
     trapezoidDirection: 0,
     addon: null,
     bullet: {
         type: "bullet",
-        health: 0.5,
-        damage: 0.6,
+        health: 3,
+        damage: 1,
         speed: 1,
         scatterRate: 1,
-        lifeLength: 0.5,
+        lifeLength: 2,
+        sizeRatio: 1,
+        absorbtionFactor: 1
+    }
+};
+
+const RocketBarrelDefinition3: BarrelDefinition = {
+    angle:  -Math.PI/2,
+    offset: 0,
+    size: 65,
+    width: 37.8 ,
+    delay: 0,
+    reload: 0.5,
+    recoil: 0,
+    isTrapezoid: false,
+    trapezoidDirection: 0,
+    addon: null,
+    bullet: {
+        type: "bullet",
+        health: 3,
+        damage: 1,
+        speed: 1,
+        scatterRate: 1,
+        lifeLength: 2,
+        sizeRatio: 1,
+        absorbtionFactor: 1
+    }
+};
+
+const RocketBarrelDefinition4: BarrelDefinition = {
+    angle:  Math.PI/2,
+    offset: 0,
+    size: 65,
+    width: 37.8 ,
+    delay: 0,
+    reload: 0.5,
+    recoil: 0,
+    isTrapezoid: false,
+    trapezoidDirection: 0,
+    addon: null,
+    bullet: {
+        type: "bullet",
+        health: 3,
+        damage: 1,
+        speed: 1,
+        scatterRate: 1,
+        lifeLength: 2,
         sizeRatio: 1,
         absorbtionFactor: 1
     }
@@ -81,7 +127,7 @@ const RocketBarrelDefinition2: BarrelDefinition = {
 /**
  * Represents all rocketeer rockets in game.
  */
-export default class Skimmer extends Bullet implements BarrelBase {
+export default class HyperGlider extends Bullet implements BarrelBase {
     /** The rocket's barrel */
     private launrocketBarrel: Barrel[];
 
@@ -116,11 +162,24 @@ export default class Skimmer extends Bullet implements BarrelBase {
                // this.physicsData.width = this.definition.width
             }
         }(this, RocketBarrelDefinition2);
-
+        const s3 = new class extends Barrel {
+            // Keep the width constant
+            protected resize() {
+                super.resize();
+               // this.physicsData.width = this.definition.width
+            }
+        }(this, RocketBarrelDefinition3);
+        const s4 = new class extends Barrel {
+            // Keep the width constant
+            protected resize() {
+                super.resize();
+               // this.physicsData.width = this.definition.width
+            }
+        }(this, RocketBarrelDefinition4);
        // s1.styleData.values.color = this.styleData.values.color;
         //s2.styleData.values.color = this.styleData.values.color;
 
-        skimmerBarrels.push(s1, s2);
+        skimmerBarrels.push(s1, s2,s3,s4);
     }
 
     public tick(tick: number) {
